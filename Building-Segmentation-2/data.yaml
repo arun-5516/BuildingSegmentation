@@ -1,0 +1,12 @@
+names:
+- building
+nc: 1
+roboflow:
+  license: CC BY 4.0
+  project: building-segmentation-3uaut-liebi
+  url: https://universe.roboflow.com/gis-detection/building-segmentation-3uaut-liebi/dataset/2
+  version: 2
+  workspace: gis-detection
+test: ../test/images
+train: ../train/images
+val: ../valid/images
