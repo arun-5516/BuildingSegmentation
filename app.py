@@ -3,14 +3,13 @@ import io
 import zipfile
 from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
-from predict_service import predict_image_bytes  # expects (image_bytes, conf, meters_per_pixel, min_area_m2) -> mask_bytes, overlay_bytes, geojson_bytes, debug_bytes
+from predict_service import predict_image_bytes  # <--- uses the in-memory function
 
 app = Flask(__name__)
 CORS(app)
 
 @app.route("/api/process", methods=["POST"])
 def api_process():
-    # Expect files in form field 'images' (multiple)
     if "images" not in request.files:
         return jsonify({"error": "No files uploaded. Use form field 'images'."}), 400
 
@@ -19,7 +18,6 @@ def api_process():
     meters_per_pixel = float(request.form.get("meters_per_pixel", 0.03))
     min_area_m2 = float(request.form.get("min_area_m2", 0.05))
 
-    # Create an in-memory ZIP
     zip_buf = io.BytesIO()
     with zipfile.ZipFile(zip_buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for f in files:
@@ -33,11 +31,9 @@ def api_process():
                     min_area_m2=min_area_m2
                 )
             except Exception as e:
-                # include an error text file for this input
                 zf.writestr(f"{name}_error.txt", str(e))
                 continue
 
-            # write outputs to zip (only if present)
             if mask_b:
                 zf.writestr(f"{name}_mask.png", mask_b)
             if overlay_b:
@@ -48,10 +44,8 @@ def api_process():
                 zf.writestr(f"{name}_debug_mask.png", debug_b)
 
     zip_buf.seek(0)
-    # Return zip as attachment
     return send_file(zip_buf, mimetype="application/zip", as_attachment=True, download_name="results.zip")
 
-# quick health endpoint
 @app.route("/ping")
 def ping():
     return "ok", 200
