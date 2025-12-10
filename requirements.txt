@@ -1,7 +1,7 @@
 streamlit==1.52.1
 ultralytics==8.3.235
 opencv-python-headless==4.8.0.74
-numpy
+numpy==1.26.4
 Pillow
 shapely
 roboflow
