@@ -7,6 +7,19 @@ Requirements:
 Place your model file "yolov8n-seg.pt" in the same folder as this script,
 or set MODEL_PATH to an absolute path.
 """
+# safe_imports.py (or put at top of your streamlit script)
+try:
+    import cv2
+    CV2_AVAILABLE = True
+except Exception as e:
+    cv2 = None
+    CV2_AVAILABLE = False
+    import logging
+    logging.warning(f"cv2 import failed: {e}. Falling back to Pillow-only functionality.")
+
+from PIL import Image, ImageDraw, ImageOps
+import numpy as np
+
 
 import os
 import io
